@@ -1,11 +1,13 @@
 package com.quocanhit.taskuserservice.config;
 
-import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,89 +21,59 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import javax.servlet.Filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationConfiguration {
 
+    @Autowired
+    JwtTokenValidator jwtAuthFilter;
+
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.sessionManagement(
-                        management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).authorizeHttpRequests(
-                        authorize -> authorize.requestMatchers("/api/auth/**").authenticated().anyRequest().permitAll()
-                ).addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable())
-                //.cors(cors -> cors.configurationSource(configurationSource()))
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults());
-        return httpSecurity.build();
-    }
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        RequestMatcher publicUrls = new OrRequestMatcher(
+                new AntPathRequestMatcher("/api/auth/**"),
+                new AntPathRequestMatcher("/v2/api-docs"),
+                new AntPathRequestMatcher("/v3/api-docs"),
+                new AntPathRequestMatcher("/v3/api-docs/**"),
+                new AntPathRequestMatcher("/swagger-resources"),
+                new AntPathRequestMatcher("/swagger-resources/**"),
+                new AntPathRequestMatcher("/configuration/ui"),
+                new AntPathRequestMatcher("/configuration/security"),
+                new AntPathRequestMatcher("/swagger-ui/**"),
+                new AntPathRequestMatcher("/webjars/**"),
+                new AntPathRequestMatcher("/swagger-ui.html"),
+                new AntPathRequestMatcher("/bot")
+        );
 
-    private CorsConfigurationSource configurationSource() {
-        return new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(Collections.singletonList("*"));
-                config.setAllowedMethods(Collections.singletonList("*"));
-                config.setAllowCredentials(true);
-                config.setAllowedHeaders(Collections.singletonList("*"));
-                config.setExposedHeaders(Arrays.asList("Authorization"));
-                config.setMaxAge(3600L);
+        http
+                .csrf()
+                .disable()
+                .authorizeRequests()
+                .requestMatchers(publicUrls)
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout()
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+        ;
 
-                return config;
-            }
-        };
+        return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    //bang
-//    private JwtTokenValidator jwtTokenValidator;
-//    private  JwtProvider jwtProvider;
-//
-//    private AuthenticationProvider authenticationProvider;
-//
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        RequestMatcher publicUrls = new OrRequestMatcher(
-//                new AntPathRequestMatcher("/api/v1/auth/**"),
-//                new AntPathRequestMatcher("/v2/api-docs"),
-//                new AntPathRequestMatcher("/v3/api-docs"),
-//                new AntPathRequestMatcher("/v3/api-docs/**"),
-//                new AntPathRequestMatcher("/swagger-resources"),
-//                new AntPathRequestMatcher("/swagger-resources/**"),
-//                new AntPathRequestMatcher("/configuration/ui"),
-//                new AntPathRequestMatcher("/configuration/security"),
-//                new AntPathRequestMatcher("/swagger-ui/**"),
-//                new AntPathRequestMatcher("/webjars/**"),
-//                new AntPathRequestMatcher("/swagger-ui.html"),
-//                new AntPathRequestMatcher("/bot")
-//        );
-//
-//        http
-//                .csrf()
-//                .disable()
-//                .authorizeRequests()
-//                .requestMatchers(publicUrls)
-//                .permitAll()
-//                .anyRequest()
-//                .authenticated()
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authenticationProvider(authenticationProvider)
-//                .addFilterBefore(new JwtTokenValidator(), UsernamePasswordAuthenticationFilter.class)
-//        ;
-//
-//        return http.build();
-//    }
-
 }

@@ -1,4 +1,4 @@
-package com.quocanhit.taskuserservice.service;
+package com.quocanhit.taskuserservice.service.implement;
 
 import com.quocanhit.taskuserservice.model.User;
 import com.quocanhit.taskuserservice.repository.UserRepository;
@@ -20,7 +20,7 @@ public class CustomerServiceImplement implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
+        User user = userRepository.findUserByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + username);
         }

@@ -5,10 +5,9 @@ import com.quocanhit.taskuserservice.model.AuthRequest;
 import com.quocanhit.taskuserservice.model.AuthResponse;
 import com.quocanhit.taskuserservice.model.User;
 import com.quocanhit.taskuserservice.repository.UserRepository;
-import com.quocanhit.taskuserservice.service.CustomerServiceImplement;
+import com.quocanhit.taskuserservice.service.implement.CustomerServiceImplement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,7 +36,7 @@ public class AuthController {
         String mobile = user.getMobile();
 
         //check email exists
-        User isEmailExist = userRepository.findByEmail(email);
+        User isEmailExist = userRepository.findUserByEmail(email);
         if (isEmailExist != null) {
             throw new Exception("Email: { " + email + " } is already. User with another email");
         }
@@ -46,7 +44,7 @@ public class AuthController {
         //Create new account
         User createUser = new User();
         createUser.setEmail(email);
-        createUser.setPassword(password);
+        createUser.setPassword(passwordEncoder.encode(password));
         createUser.setRole(role);
         createUser.setFullname(fullname);
         createUser.setMobile(mobile);
@@ -55,8 +53,10 @@ public class AuthController {
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // Generate jwt token
         String token = JwtProvider.generateToken(authentication);
 
+        // Give response token
         AuthResponse authResponse = new AuthResponse();
         authResponse.setJwt(token);
         authResponse.setMessage("Register successfully.");

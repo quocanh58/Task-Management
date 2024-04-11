@@ -5,12 +5,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 
 public class JwtProvider {
     static SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
@@ -22,8 +24,8 @@ public class JwtProvider {
         String jwt = Jwts.builder()
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + 864000000))
-                .claim("Email: ", auth.getName())
-                .claim("Role: ", roles)
+                .claim("Email", auth.getName())
+                .claim("Authorities", roles)
                 .signWith(key)
                 .compact();
 
@@ -33,7 +35,7 @@ public class JwtProvider {
     public static String getEmailFromJwtToken(String jwt) {
         jwt = jwt.substring(7);
 
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJwt(jwt).getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
         String email = String.valueOf(claims.get("email"));
 
         return email;
