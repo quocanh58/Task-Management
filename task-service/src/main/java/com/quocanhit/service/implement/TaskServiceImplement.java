@@ -34,7 +34,7 @@ public class TaskServiceImplement implements TaskService {
     }
 
     @Override
-    public List<Task> getTasks(TaskStatus status) throws Exception {
+    public List<Task> getAllTasks(TaskStatus status) throws Exception {
         List<Task> tasks = taskRepository.findAll();
         List<Task> filteredTasks = tasks.stream().filter(
                 task -> status == null ||
@@ -44,7 +44,7 @@ public class TaskServiceImplement implements TaskService {
     }
 
     @Override
-    public Task update(Long id, Task updateTask, Long userId) throws Exception {
+    public Task updateTask(Long id, Task updateTask, Long userId) throws Exception {
         Task existingTask = getTaskById(id);
 
         if (updateTask.getTitle() != null) {
@@ -66,7 +66,7 @@ public class TaskServiceImplement implements TaskService {
     }
 
     @Override
-    public Boolean delete(Long id) throws Exception {
+    public Boolean deleteTask(Long id) throws Exception {
         boolean isDelete = false;
         Optional<Task> findTaskToDelete = taskRepository.findById(id);
 
@@ -80,7 +80,7 @@ public class TaskServiceImplement implements TaskService {
 
 
     @Override
-    public Task assignToUser(Long userId, Long taskId) throws Exception {
+    public Task assignedToUser(Long userId, Long taskId) throws Exception {
         Task exsisTask = getTaskById(taskId);
         exsisTask.setAssignedUserId(userId);
         exsisTask.setStatus(TaskStatus.DONE);

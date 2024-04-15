@@ -25,12 +25,12 @@ public class UserController {
         User user = userService.getUserProfile(jwt);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
     @GetMapping()
     public ResponseEntity<List<User>> getUsers(@RequestHeader("Authorization") String jwt) {
         List<User> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
-
 
     @GetMapping("/ok")
     public ResponseEntity<String> getOk() {

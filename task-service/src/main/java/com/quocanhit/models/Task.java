@@ -1,10 +1,12 @@
 package com.quocanhit.models;
 
 import com.quocanhit.models.Enum.TaskStatus;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ public class Task {
     private String description;
     private String image;
     private Long assignedUserId;
+
+    @Nonnull
     private List<String> tags = new ArrayList<String>();
     private TaskStatus status;
     private LocalDateTime deadline;

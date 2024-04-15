@@ -10,13 +10,13 @@ public interface TaskService {
 
     Task getTaskById(Long id) throws Exception;
 
-    List<Task> getTasks(TaskStatus status) throws Exception;
+    List<Task> getAllTasks(TaskStatus status) throws Exception;
 
-    Task update(Long id, Task updateTask, Long userId) throws Exception;
+    Task updateTask(Long id, Task updateTask, Long userId) throws Exception;
 
-    Boolean delete(Long id) throws Exception;
+    Boolean deleteTask(Long id) throws Exception;
 
-    Task assignToUser(Long userId, Long taskId) throws Exception;
+    Task assignedToUser(Long userId, Long taskId) throws Exception;
 
     List<Task> assignUserTasks(Long userId, TaskStatus status) throws Exception;
 
