@@ -1,9 +1,9 @@
 package com.quocanhit.tasksubmissionservice.model.Enum;
 
 public enum TaskStatus {
-    PENDING("Pending"),
-    ASSIGNED("Assigned"),
-    DONE("Done");
+    PENDING("PENDING"),
+    ASSIGNED("ASSIGNED"),
+    DONE("DONE");
 
     TaskStatus(String done) {
     }

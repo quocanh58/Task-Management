@@ -78,7 +78,7 @@ public class TaskController {
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(
             @PathVariable Long id,
-            @PathVariable Task req,
+            @RequestBody Task req,
             @RequestHeader("Authorization") String jwt) throws Exception {
 
         UserDTO user = userService.getUserProfile(jwt);

@@ -2,8 +2,10 @@ package com.quocanhit.taskuserservice.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -40,6 +43,9 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
                 String email = String.valueOf(claims.get("email"));
                 String authorizes = String.valueOf(claims.get("authorizes"));
+//                String expiration = Jwts.builder()
+//                        .setExpiration(new Date(new Date().getTime() + jwtExpirationMs))
+//                        .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
 
                 List<GrantedAuthority> auths = AuthorityUtils.commaSeparatedStringToAuthorityList(authorizes);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, auths);

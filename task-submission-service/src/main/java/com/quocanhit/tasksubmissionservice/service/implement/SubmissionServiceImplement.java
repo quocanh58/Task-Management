@@ -41,23 +41,29 @@ public class SubmissionServiceImplement implements SubmissionService {
     }
 
     @Override
-    public List<Submission> getAllSubmissions() throws Exception {
+    public List<Submission> getAllSubmissions() {
         return submissionRepository.findAll();
     }
 
     @Override
-    public List<Submission> getTaskSubmissionsByTaskId(Long taskId) throws Exception {
+    public List<Submission> getTaskSubmissionsByTaskId(Long taskId) {
         return submissionRepository.findByTaskId(taskId);
     }
 
     @Override
-    public Submission acceptDeadlineSubmission(Long id, String status) throws Exception {
-        Submission submission = getTaskSubmissionById(id);
-        submission.setStatus(status);
-        if (status != null && status.equals("ACCEPT")) {
-            taskService.completeTask(submission.getTaskId());
-        }
+    public Submission acceptDeadlineSubmission(Long id, String status,String jwt){
+        try{
+            Submission submission = getTaskSubmissionById(id);
+            submission.setStatus(status);
+            if (status != null && status.equals("ACCEPT")) {
+                taskService.completeTask(submission.getTaskId(),jwt);
+            }
 
-        return submissionRepository.save(submission);
+            return submissionRepository.save(submission);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }

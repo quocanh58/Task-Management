@@ -9,9 +9,9 @@ public interface SubmissionService {
 
     Submission getTaskSubmissionById(Long submissionId) throws Exception;
 
-    List<Submission> getAllSubmissions() throws Exception;
+    List<Submission> getAllSubmissions();
 
-    List<Submission> getTaskSubmissionsByTaskId(Long taskId) throws Exception;
+    List<Submission> getTaskSubmissionsByTaskId(Long taskId);
 
-    Submission acceptDeadlineSubmission(Long id, String status) throws Exception;
+    Submission acceptDeadlineSubmission(Long id, String status,String jwt) throws Exception;
 }
