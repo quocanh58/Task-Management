@@ -66,7 +66,6 @@ public class SubmissionController {
     }
 
     @PutMapping("/{id}")
-    //@RequestMapping(value = "/{id}", produces = "application/json", method = RequestMethod.PUT)
     public ResponseEntity<Submission> acceptOrDeadlineSubmission(
             @PathVariable Long id,
             @RequestParam("status") String status,
